@@ -12,6 +12,7 @@ source env/bin/activate
 
 ### Required installations
 
-pip install flask requests
+- pip install flask requests
+- pip install flask-cors
 
 
