@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from azure import chatGPT3_response
+from upload import save_uploaded_files
+from sentiment import get_sentiment
+
 
 SAMPLE_RESPONSE = """
 You can resolve CORS issue in Flask by installing and using the Flask-CORS extension. Here are the steps to do so:
@@ -51,12 +53,12 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})  # Enable COR
 # Endpoint for document upload
 @app.route('/upload', methods=['POST'])
 def upload_document():
-    file = request.files['file']  # Assuming file input field name is 'file'
-    # Save the file to a desired location
-    # file.save('path/to/save/' + file.filename)
-    
-    # Call function for document parsing
-    return jsonify({'message': 'Document uploaded and parsed successfully', 'parsed_data': 'parsed_data'})
+    file = request.files.getlist('file')[0]
+    print("upload :", file)
+    upload_stats = save_uploaded_files(file)
+    if upload_stats == 'saved':
+        file_name, sentiment = get_sentiment()
+    return jsonify({'message': 'Document uploaded and parsed successfully', 'file_name': file_name, 'sentiment': sentiment})
 
 # Endpoint for user queries
 @app.route('/ask', methods=['POST'])
