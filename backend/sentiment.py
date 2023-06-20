@@ -2,7 +2,6 @@ import os
 from transformers import pipeline
 from pdf import convert_pdf_to_text
 
-
 def perform_sentiment_analysis(text):
     classifier = pipeline("sentiment-analysis")
     sentiment = classifier(text)[0]
@@ -25,9 +24,8 @@ def get_sentiment():
     print("PDF File\t\tSentiment")
 
     print("-----------------------------")
-    print(output_table[0][0], output_table[0][1])
-    # for row in output_table:
-    #     print(f"{row[0]}\t\t{row[1]}")
-    return output_table[1][0], output_table[1][1]
+    for row in output_table:
+        print(f"{row[0]}\t\t{row[1]}")
+    # return output_table[1][0], output_table[1][1]
 
 # get_sentiment()

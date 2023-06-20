@@ -7,9 +7,9 @@
 
 
 import PyPDF2
+from mySecrets import LOCAL_PATH
 
-# Step 1: Convert PDFs to text
-def convert_pdf_to_text(file_path):
+def convert_pdf_to_text_from_storage(file_path):
     with open(file_path, 'rb') as file:
         pdf = PyPDF2.PdfReader(file)
         text = ''
@@ -17,5 +17,20 @@ def convert_pdf_to_text(file_path):
         for page in range(n):
             text += pdf.pages[page].extract_text();
         return text
+    
+def convert_pdf_to_text(file):
+    pdf = PyPDF2.PdfReader(file)
+    text = ''
+    n = len(pdf.pages)
+    for page in range(n):
+        text += pdf.pages[page].extract_text();
+    return text
+
+def save_as_text(file):
+    txt = convert_pdf_to_text(file)
+    with open(LOCAL_PATH + 'database/source_of_knowledge/' + file.filename + '.txt', "w") as file:
+        file.write(txt)
+    return txt
+
 
 
