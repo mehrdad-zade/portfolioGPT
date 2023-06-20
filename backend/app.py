@@ -6,6 +6,7 @@ import upload
 from sentiment import perform_sentiment_analysis
 import pdf
 from index_data import qNa_source_of_knowledge
+from azure import chatGPT3_response
 
 
 
@@ -72,7 +73,7 @@ def upload_document():
         sentiment_res[file.filename] = perform_sentiment_analysis(txt)
     # index text file of source of knowledge
     # createVectorIndex()
-    
+
     # return jsonify({'message': 'Document uploaded and parsed successfully', 'file_name': file_name, 'sentiment': sentiment})
     return jsonify({'message': 'Document uploaded and parsed successfully', 'sentiment': sentiment_res})
 
@@ -80,8 +81,10 @@ def upload_document():
 @app.route('/ask', methods=['POST'])
 def ask_question():
     question = request.json['question']  # Assuming question is sent in the request body as JSON
-    # return jsonify({'answer': chatGPT3_response(question)})
-    answer = str(qNa_source_of_knowledge(question))
+    answer = chatGPT3_response(question)
+    if answer == None or 'September 2021' in answer or 'As an AI language model' in answer:
+        pre_text = "I'm sorry I couldn't find the answer to your question in the public chatGPT domain. However, I can assist you with your private data.\n"
+        answer = pre_text + str(qNa_source_of_knowledge(question))
     return jsonify({'answer': answer})
 
 # Endpoint initial test
