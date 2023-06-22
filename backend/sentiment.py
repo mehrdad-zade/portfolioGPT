@@ -10,7 +10,7 @@ def perform_sentiment_analysis(text):
 def get_sentiment():   
     current_directory = os.getcwd()
     parent_directory = os.path.dirname(current_directory)
-    pdf_folder = os.path.join(parent_directory, 'database/uploads') # Update with the folder containing your PDF files
+    pdf_folder = os.path.join(parent_directory, 'data/uploads') # Update with the folder containing your PDF files
     output_table = []
 
     for filename in os.listdir(pdf_folder):

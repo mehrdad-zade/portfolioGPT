@@ -3,8 +3,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # ignore tensorflow warnings
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from sentiment import perform_sentiment_analysis
-from openai_api import qNa_source_of_knowledge, createVectorIndex
-from custom_azure import chatGPT3_response, gpt_res_is_invalid
+from openai_api import qNa_source_of_knowledge, createVectorIndex, chatGPT3_response
+from validation import gpt_res_is_invalid
+# from custom_azure import chatGPT3_response
 import upload
 import pdf
 
@@ -19,7 +20,7 @@ def upload_document():
     sentiment_res = {} # dictionary to store sentiment of files
 
     for file in files:
-        # save files to database/uploads
+        # save files to data/uploads
         upload.save(file)
         # convert files to text and save them to source of knowledge
         txt = pdf.save_as_text(file)
@@ -58,7 +59,7 @@ if __name__ == '__main__':
 pipeline:
 
 - upload files:
-    - save files to database/uploads
+    - save files to data/uploads
     - parse files to text
     - index text as source of knowledge
 

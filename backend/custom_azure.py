@@ -46,7 +46,7 @@ def gpt_res_is_invalid(gptResponse):
 # from gpt_index import SimpleDirectoryReader, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 # from mySecrets import LOCAL_PATH, AZURE_CONVERSATIONAL_LANGUAGE_ENDPOINT, AZURE_CONVERSATIONAL_LANGUAGE_SUBSCRIPTION_KEY, AZURE_BLOB_CONNECTION_STRING, AZURE_BLOB_CONTAINER
 
-# vIdx = LOCAL_PATH + 'database/source_of_knowledge/vectorIndex.json'
+# vIdx = LOCAL_PATH + 'data/source_of_knowledge/vectorIndex.json'
 
 
 # def createVectorIndex():

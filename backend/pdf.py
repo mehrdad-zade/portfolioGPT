@@ -28,7 +28,7 @@ def convert_pdf_to_text(file):
 
 def save_as_text(file):
     txt = convert_pdf_to_text(file)
-    with open(LOCAL_PATH + 'database/source_of_knowledge/' + file.filename + '.txt', "w") as file:
+    with open(LOCAL_PATH + 'data/source_of_knowledge/' + file.filename + '.txt', "w") as file:
         file.write(txt)
     return txt
 

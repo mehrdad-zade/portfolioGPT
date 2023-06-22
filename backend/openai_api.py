@@ -11,8 +11,9 @@ from langchain import OpenAI
 from mySecrets import LOCAL_PATH, OpenAI_API_KEY_PERSONAL
 
 os.environ['OPENAI_API_KEY'] = OpenAI_API_KEY_PERSONAL
-openai.organization = "org-8kRclvZ4TrPB1yhir9Eqn6DJ"
-vIdx = LOCAL_PATH + 'database/source_of_knowledge/vectorIndex.json'
+# openai.organization = ""
+vIdx = LOCAL_PATH + 'data/source_of_knowledge/vectorIndex.json'
+
 
 
 def createVectorIndex():
@@ -28,7 +29,7 @@ def createVectorIndex():
     llmPredictor = LLMPredictor(llm=OpenAI(temperature=0, model_name="text-ada-001", max_token=tokens)) #text-davinci-003
 
     #load data
-    docs = SimpleDirectoryReader(LOCAL_PATH + 'database/source_of_knowledge').load_data()
+    docs = SimpleDirectoryReader(LOCAL_PATH + 'data/source_of_knowledge').load_data() # make sure only the text files are in the folder
 
         
     vectorIndex = GPTSimpleVectorIndex(documents=docs, llm_predictor=llmPredictor, prompt_helper=prompt_helper)
@@ -53,8 +54,6 @@ def qNa():
 # qNa()
 
 def qNa_source_of_knowledge(question):
-    os.environ['OPENAI_API_KEY'] = OpenAI_API_KEY_PERSONAL
-    openai.organization = "org-8kRclvZ4TrPB1yhir9Eqn6DJ"
     if os.path.isfile(vIdx):
         vIndex = GPTSimpleVectorIndex.load_from_disk(vIdx)
         print('2------------------------------------------')
@@ -82,3 +81,4 @@ def chatGPT3_response(user_input):
 # prompt = "What is the capital of France?"
 # response = chatGPT3_response(prompt)
 # print(response)
+
