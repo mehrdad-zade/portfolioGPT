@@ -1,5 +1,5 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # ignore tensorflow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' # ignore tensorflow warnings. make surer this line is before importting tensorflow
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from sentiment import perform_sentiment_analysis
