@@ -5,8 +5,6 @@ import numpy as np
 import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from datetime import datetime
 
 # Step 1: Load data from CSV
 # Read the CSV file containing the stock data from yahoo finance for ONEX
@@ -100,25 +98,4 @@ next_90_days = pd.date_range(last_date, periods=90, freq='D')  # Generate dates 
 # Print the predicted stock prices for the next 90 days
 for i in range(len(predictions)):
     print(f'{next_90_days[i].date()}: {predictions[i][0]}')
-
-# step 8: Plot the predictions
-
-# stock historical price data
-df_A = data
-df_A['Date'] = pd.to_datetime(df_A['Date'])
-print(df_A.tail())
-
-# add the predicted price to the dataframe
-df_B = df_A.copy()
-new_row = {'Date': datetime(2023, 6, 22), 'Close': 68}
-df_B = df_B.append(new_row, ignore_index=True)
-print(df_B.tail())
-
-plt.figure(figsize = (15,10))
-plt.plot(df_B['Date'], df_B['Close'], label='OneX - Next Day Prediction', color='red')
-plt.plot(df_A['Date'], df_A['Close'], label='OneX - Daily Stock Price', color='blue')
-plt.legend(loc='best')
-plt.show()
-
-
 
