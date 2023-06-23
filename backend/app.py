@@ -36,13 +36,15 @@ def upload_document():
 @app.route('/ask', methods=['POST'])
 def ask_question():
     question = request.json['question']  # Assuming question is sent in the request body as JSON
+
+    if "get stock prediction" in question:
+        return jsonify({'answer': '', 'has_image': True})
+
     answer = chatGPT3_response(question)
-    print('1------------------------------------------')
     if gpt_res_is_invalid(answer):
         pre_text = "I'm sorry I couldn't find the answer to your question in the public chatGPT domain. However, I can assist you with your private data.\n"        
         answer = pre_text + str(qNa_source_of_knowledge(question))        
-        print('n------------------------------------------')
-    return jsonify({'answer': answer})
+    return jsonify({'answer': answer, 'has_image': False})
 
 # Endpoint initial test
 @app.route('/health', methods=['GET'])
@@ -61,7 +63,9 @@ pipeline:
 - upload files:
     - save files to data/uploads
     - parse files to text
-    - index text as source of knowledge
+        - index text as source of knowledge
+        - get sentiment of files
+            - update sentiment table on database
 
 - ask questions:
     - get question from user
