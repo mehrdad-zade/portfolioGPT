@@ -56,11 +56,8 @@ def qNa():
 def qNa_source_of_knowledge(question):
     if os.path.isfile(vIdx):
         vIndex = GPTSimpleVectorIndex.load_from_disk(vIdx)
-        print('2------------------------------------------')
         response = vIndex.query(question, response_mode="compact")
-        print('3------------------------------------------')
         return response
-    print('4------------------------------------------')
     return "No source of knowledge found. Please upload documents first."
 
 # # example

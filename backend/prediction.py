@@ -1,5 +1,6 @@
 import os
-import sys
+import io
+import base64
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' # ignore tensorflow warnings. make sure this line is before importing tensorflow
 import pandas as pd
 import numpy as np
@@ -8,6 +9,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import imageio as io
+from io import BytesIO
+
 
 ##################################################################################### Step 1: Load data from CSV
 
@@ -41,8 +45,8 @@ drop_out_rate = 0.2
 learning_rate = 0.001
 loss_algorithm = 'mean_squared_error'
 batch_size = 32
-epochs = 200
-number_of_neurons = 512
+epochs = 30
+number_of_neurons = 64
 
 ##################################################################################### step 4: Create sequences
 
@@ -57,101 +61,81 @@ def create_sequences(X, scaled_prices_train):
 X_train_seq, y_train_seq = create_sequences(X_train, scaled_prices_train)
 X_test_seq, y_test_seq = create_sequences(X_test, scaled_prices_test)
 
-##################################################################################### Step 5: Set up the neural network architecture
+def trainNN():
+    ##################################################################################### Step 5: Set up the neural network architecture
 
-model = tf.keras.models.Sequential([
-    tf.keras.layers.LSTM(number_of_neurons, return_sequences=True, input_shape=(X_train_seq.shape[1], X_train_seq.shape[2])),
-    tf.keras.layers.LSTM(number_of_neurons, return_sequences=True),
-    tf.keras.layers.Dropout(drop_out_rate), # dropout layers in the model architecture to randomly deactivate a fraction of neurons during training, reducing over-reliance on specific features.
-    tf.keras.layers.LSTM(number_of_neurons, return_sequences=True),
-    tf.keras.layers.LSTM(number_of_neurons, return_sequences=False),
-    tf.keras.layers.Dense(number_of_neurons, activation='relu'),
-    tf.keras.layers.Dropout(drop_out_rate),
-    tf.keras.layers.Dense(number_of_prediction_days) 
-])
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.LSTM(number_of_neurons, return_sequences=True, input_shape=(X_train_seq.shape[1], X_train_seq.shape[2])),
+        tf.keras.layers.LSTM(number_of_neurons, return_sequences=True),
+        tf.keras.layers.Dropout(drop_out_rate), # dropout layers in the model architecture to randomly deactivate a fraction of neurons during training, reducing over-reliance on specific features.
+        tf.keras.layers.LSTM(number_of_neurons, return_sequences=True),
+        tf.keras.layers.LSTM(number_of_neurons, return_sequences=False),
+        tf.keras.layers.Dense(number_of_neurons, activation='relu'),
+        tf.keras.layers.Dropout(drop_out_rate),
+        tf.keras.layers.Dense(number_of_prediction_days) 
+    ])
 
-##################################################################################### Step 6: Train the model
+    ##################################################################################### Step 6: Train the model
 
-optimizer = tf.keras.optimizers.Adam(clipnorm=1.0, learning_rate=learning_rate)  # Set the clipnorm parameter to prevent gradient explosion
-model.compile(optimizer=optimizer, loss=loss_algorithm)
-history = model.fit(X_train_seq, y_train_seq, batch_size=batch_size, epochs=epochs, verbose=1)
-model.save('stock_prediction_model.h5')
-print("--->Model saved successfully.")
+    optimizer = tf.keras.optimizers.Adam(clipnorm=1.0, learning_rate=learning_rate)  # Set the clipnorm parameter to prevent gradient explosion
+    model.compile(optimizer=optimizer, loss=loss_algorithm)
+    history = model.fit(X_train_seq, y_train_seq, batch_size=batch_size, epochs=epochs, verbose=1)
+    model.save('stock_prediction_model.h5')
+    print("--->Model saved successfully.")
 
-# # Load the saved model
-# loaded_model = tf.keras.models.load_model('stock_prediction_model.h5')
-# optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-# loaded_model.compile(optimizer=optimizer, loss='mean_squared_error')
-# print("--->Model loaded successfully.")
+    # # Load the saved model
+    # loaded_model = tf.keras.models.load_model('stock_prediction_model.h5')
+    # optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    # loaded_model.compile(optimizer=optimizer, loss='mean_squared_error')
+    # print("--->Model loaded successfully.")
 
-##################################################################################### Step 7: Evaluate the model on test data
+    ##################################################################################### Step 7: Evaluate the model on test data
 
-train_loss = model.evaluate(X_train_seq, y_train_seq, verbose=0)
-test_loss = model.evaluate(X_test_seq, y_test_seq, verbose=0)
-print(f'Training loss: {train_loss:.6f}')
-print(f'Test loss: {test_loss:.6f}')
+    train_loss = model.evaluate(X_train_seq, y_train_seq, verbose=0)
+    test_loss = model.evaluate(X_test_seq, y_test_seq, verbose=0)
+    print(f'Training loss: {train_loss:.6f}')
+    print(f'Test loss: {test_loss:.6f}')
 
-##################################################################################### Step 8: Make predictions
+    ##################################################################################### Step 8: Make predictions
 
-# Reshape the test data to match the input shape of the LSTM model
-X_test = X_test_seq.reshape((X_test_seq.shape[0], X_test_seq.shape[1], X_test_seq.shape[2]))
+def getPred(model):
+    # Reshape the test data to match the input shape of the LSTM model
+    X_test = X_test_seq.reshape((X_test_seq.shape[0], X_test_seq.shape[1], X_test_seq.shape[2]))
 
-# Make predictions on the test data
-predictions = model.predict(X_test)
+    # Retrieve the last sequence from the test data and reshape it to match the input shape of the LSTM model
+    last_sequence = X_test[-1].reshape((1, X_test_seq.shape[1], X_test_seq.shape[2]))
 
-# Retrieve the last sequence from the test data and reshape it to match the input shape of the LSTM model
-last_sequence = X_test[-1].reshape((1, X_test_seq.shape[1], X_test_seq.shape[2]))
-
-# Make a prediction for the next day
-next_day_prediction = model.predict(last_sequence)
-next_day_prediction = scaler.inverse_transform(next_day_prediction)
-# Print the predicted value for the next day
-print(f"Predicted value for the next day: {next_day_prediction[0][0]}")
-
-# Function to suppress stdout and stderr temporarily
-class SuppressOutput:
-    def __enter__(self):
-        self.original_stdout = sys.stdout
-        self.original_stderr = sys.stderr
-        sys.stdout = open(os.devnull, 'w')
-        sys.stderr = open(os.devnull, 'w')
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout.close()
-        sys.stdout = self.original_stdout
-        sys.stderr.close()
-        sys.stderr = self.original_stderr
-
-# List to store the predictions for the next 90 days
-next_90_days_predictions = []
-
-# Generate predictions for the next 90 days
-with SuppressOutput():
-    for _ in range(90):
-        # Make a prediction for the next day
-        next_day_prediction = model.predict(last_sequence)
-        next_day_prediction = scaler.inverse_transform(next_day_prediction)
-        # Append the prediction to the list
-        next_90_days_predictions.extend(next_day_prediction[0])
-        
-        # Update the input sequence for the next prediction
-        last_sequence = np.roll(last_sequence, -1, axis=1)
-        last_sequence[0, -1, 0] = next_day_prediction[0][-1]
+    # Make a prediction for the next day
+    prediction = model.predict(last_sequence)
+    prediction = scaler.inverse_transform(prediction).tolist()
+    # Print the predicted value for the next day
+    print(f"Predicted value for the next day: {prediction[0][0]}")
+    next_90_days_predictions = prediction[0]
+    return next_90_days_predictions
 
 
 ##################################################################################### step 9: Plot the predictions
 
-# stock historical price data
-df_Date = data
-df_Date['Date'] = pd.to_datetime(df_Date['Date'])
+def getPredictionPlot():
+    loaded_model = tf.keras.models.load_model('stock_prediction_model.h5') # Load the saved model
+    next_90_days_predictions = getPred(loaded_model)
+    # stock historical price data
+    df_Date = data
+    df_Date['Date'] = pd.to_datetime(df_Date['Date'])
 
-# Get the last date in the DataFrame and increment by number_of_prediction_days. then add the new dates along with next_90_days_predictions to a new df
-last_date = df_Date['Date'].iloc[-1]
-new_dates = [last_date + timedelta(days=i) for i in range(1, len(next_90_days_predictions)+1)]
-new_data = pd.DataFrame({'Date': new_dates, 'Close': next_90_days_predictions})
+    # Get the last date in the DataFrame and increment by number_of_prediction_days. then add the new dates along with next_90_days_predictions to a new df
+    last_date = df_Date['Date'].iloc[-1]
+    new_dates = [last_date + timedelta(days=i) for i in range(1, len(next_90_days_predictions)+1)]
+    new_data = pd.DataFrame({'Date': new_dates, 'Close': next_90_days_predictions})
 
-plt.figure(figsize = (15,10))
-plt.plot(data['Date'], data['Close'], label='OneX - Daily Stock Price', color='blue')
-plt.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
-plt.legend(loc='best')
-plt.show()
+    plt.figure(figsize = (15,10))
+    plt.plot(data['Date'], data['Close'], label='OneX - Daily Stock Price', color='blue')
+    plt.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
+    plt.legend(loc='best')
+    
+    plt.savefig('static/tmp_prediction.png')
+    # plt.show()
+
+
+# trainNN()
+getPredictionPlot()
