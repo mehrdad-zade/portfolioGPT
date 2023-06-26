@@ -90,4 +90,9 @@ presentation:
 - storage
 
 
+issues:
+- cannot plot on :5000/plot
+- even /health gets corropted
+
+
 '''
