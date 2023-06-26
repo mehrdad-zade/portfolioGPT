@@ -6,7 +6,7 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 ##################################################################################### Step 1: Load data from CSV
@@ -123,15 +123,18 @@ def getPredictionPlot():
     last_date = df_Date['Date'].iloc[-1]
     new_dates = [last_date + timedelta(days=i) for i in range(1, len(next_90_days_predictions)+1)]
     new_data = pd.DataFrame({'Date': new_dates, 'Close': next_90_days_predictions})
-
+    
     plt.switch_backend('Agg') # so that your server does not try to create (and then destroy) GUI windows that will never be seen.
-    plt.figure(figsize = (15,10))
+    plt.title("Next Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : " + str(round(new_data['Close'].iloc[0], 2)) + "\n" +
+              " 60  Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : "  + str(round(new_data['Close'].iloc[29], 2)) + "\n" +
+              " 90  Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : "  + str(round(new_data['Close'].iloc[89], 2)) )
+    # plt.figure(figsize=(8, 4))
+    # plt.subplots(figsize=(14, 4)) 
+    # plt.subplots_adjust(top=0.15)
     plt.plot(data['Date'], data['Close'], label='OneX - Daily Stock Price', color='blue')
     plt.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
     plt.legend(loc='best')
-    
     plt.savefig('static/tmp_prediction.png')
-    
     # plt.show()
 
 
