@@ -42,13 +42,15 @@ def ask_question():
 
     if "get stock prediction" in question:
         getPredictionPlot()
-        return jsonify({'answer': "Please find the stock prediction plot in under /plot endpoint"})
+        answer = "Please find the stock prediction plot"
+        hasImage = True
+        return jsonify({'answer': answer, 'hasImage': hasImage})
 
     answer = chatGPT3_response(question)
     if gpt_res_is_invalid(answer):
         pre_text = "I'm sorry I couldn't find the answer to your question in the public chatGPT domain. However, I can assist you with your private data.\n"        
         answer = pre_text + str(qNa_source_of_knowledge(question))        
-    return jsonify({'answer': answer})
+    return jsonify({'answer': answer, 'hasImage': False})
 
 @app.route('/plot', methods=['GET'])
 def show_image():

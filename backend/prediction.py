@@ -1,6 +1,4 @@
 import os
-import io
-import base64
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' # ignore tensorflow warnings. make sure this line is before importing tensorflow
 import pandas as pd
 import numpy as np
@@ -8,9 +6,7 @@ import tensorflow as tf
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import imageio as io
-from io import BytesIO
+from datetime import timedelta
 
 
 ##################################################################################### Step 1: Load data from CSV
@@ -128,14 +124,16 @@ def getPredictionPlot():
     new_dates = [last_date + timedelta(days=i) for i in range(1, len(next_90_days_predictions)+1)]
     new_data = pd.DataFrame({'Date': new_dates, 'Close': next_90_days_predictions})
 
+    plt.switch_backend('Agg') # so that your server does not try to create (and then destroy) GUI windows that will never be seen.
     plt.figure(figsize = (15,10))
     plt.plot(data['Date'], data['Close'], label='OneX - Daily Stock Price', color='blue')
     plt.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
     plt.legend(loc='best')
     
     plt.savefig('static/tmp_prediction.png')
+    
     # plt.show()
 
 
 # trainNN()
-getPredictionPlot()
+# getPredictionPlot()
