@@ -125,18 +125,22 @@ def getPredictionPlot():
     new_data = pd.DataFrame({'Date': new_dates, 'Close': next_90_days_predictions})
     
     plt.switch_backend('Agg') # so that your server does not try to create (and then destroy) GUI windows that will never be seen.
-    plt.title("Next Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : " + str(round(new_data['Close'].iloc[0], 2)) + "\n" +
+    fig, (axs1, axs2) = plt.subplots(2, 1, figsize=(15, 8)) 
+    # plot the historical data (blue) and the predictions (red)
+    axs1.set_title("Next Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : " + str(round(new_data['Close'].iloc[0], 2)) + "\n" +
               " 60  Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : "  + str(round(new_data['Close'].iloc[29], 2)) + "\n" +
               " 90  Day Prediction (" + new_dates[0].strftime("%m/%d/%Y") + ") : "  + str(round(new_data['Close'].iloc[89], 2)) )
-    # plt.figure(figsize=(8, 4))
-    # plt.subplots(figsize=(14, 4)) 
-    # plt.subplots_adjust(top=0.15)
-    plt.plot(data['Date'], data['Close'], label='OneX - Daily Stock Price', color='blue')
-    plt.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
-    plt.legend(loc='best')
+    axs1.plot(data['Date'],     data['Close'],      label="OneX - Historical Prices",   color='blue')
+    axs1.plot(new_data['Date'], new_data['Close'],  label='OneX - Predicted Price',     color='red')
+    # plot the predicted values
+    axs2.plot(new_data['Date'], new_data['Close'], label='OneX - Predicted Price', color='red')
+    axs2.tick_params(axis='x', rotation=45) # Rotate the tick labels on x-axis for ax2 only
+    
+    axs1.legend(loc='best')
+    axs2.legend(loc='best')
     plt.savefig('static/tmp_prediction.png')
     # plt.show()
 
 
 # trainNN()
-# getPredictionPlot()
+getPredictionPlot()
