@@ -8,9 +8,12 @@ import os
 import openai
 from gpt_index import SimpleDirectoryReader, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from langchain import OpenAI
+from llama_index import GPTVectorStoreIndex, TrafilaturaWebReader
+import chromadb
 from mySecrets import LOCAL_PATH, OpenAI_API_KEY_PERSONAL
 
 os.environ['OPENAI_API_KEY'] = OpenAI_API_KEY_PERSONAL
+openai.api_key = OpenAI_API_KEY_PERSONAL
 # openai.organization = ""
 vIdx = LOCAL_PATH + 'data/source_of_knowledge/vectorIndex.json'
 
@@ -74,8 +77,31 @@ def chatGPT3_response(user_input):
         )
     return res["choices"][0]["message"]["content"]
 
-# # Example usage
-# prompt = "What is the capital of France?"
-# response = chatGPT3_response(prompt)
-# print(response)
+# Example usage
+prompt = "What is the capital of France?"
+response = chatGPT3_response(prompt)
+print(response)
 
+
+def create_embedding(name):
+    chroma_client = chromadb.Client()
+    return chroma_client.create_collection(name)
+
+def query_pages(collection, urls, questions):
+    docs = TrafilaturaWebReader().load_data(urls)
+    index = GPTVectorStoreIndex.from_documents(docs, chroma_collection=collection)
+    query_engine = index.as_query_engine()
+    for question in questions:
+        print(f"Question: {question} \n")
+        print(f"Answer: {query_engine.query(question)}")
+
+
+# # test case
+# urls = ["https://mehrdad-zade.github.io/", "https://mehrdad-zade.github.io/#Experience"]    
+# questions = ["tell me a bit about mehrdad's background what kind of job would he be suitable for"]
+# collection = create_embedding("supertype")
+# query_pages(
+#         collection,
+#         urls,
+#         questions
+#     )
