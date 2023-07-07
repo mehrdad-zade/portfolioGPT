@@ -1,0 +1,29 @@
+Agent: Good morning! Thank you for calling our bank. How may I assist you today?
+
+Client: Hi, I would like to open a chequing account.
+
+Agent: Great! We have several types of chequing accounts. May I know which one you are interested in?
+
+Client: I’m not sure. Can you tell me more about them?
+
+Agent: Sure. We have three types of chequing accounts: Basic, Premium, and Student. The Basic account has no monthly fee but has limited transactions. The Premium account has unlimited transactions but requires a minimum balance of $5000. The Student account is designed for students and has no monthly fee and no minimum balance requirement.
+
+Client: I think I want the Basic account.
+
+Agent: Okay, I can help you with that. May I know your name and address?
+
+Client: My name is John Smith and my address is 123 Main Street.
+
+Agent: Thank you. May I also know your social security number?
+
+Client: Sure, it’s 123-45-6789.
+
+Agent: Great! We will need to verify your identity. Can you please provide your driver’s license number?
+
+Client: Yes, it’s 123456789.
+
+Agent: Thank you. We will now proceed with opening your account. Is there anything else I can help you with?
+
+Client: No, that’s all.
+
+Agent: Alright then. Thank you for choosing our bank. Have a great day!
