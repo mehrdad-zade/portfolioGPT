@@ -143,4 +143,4 @@ def getPredictionPlot():
 
 
 # trainNN()
-getPredictionPlot()
+# getPredictionPlot()

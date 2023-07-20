@@ -29,7 +29,7 @@ def upload_document():
         # convert files to text and save them to source of knowledge
         txt = pdf.save_as_text(file)
         # get sentiment of files
-        sentiment_res[file.filename] = perform_sentiment_analysis(txt)
+        # sentiment_res[file.filename] = perform_sentiment_analysis(txt)
     # index text file of source of knowledge
     createVectorIndex()
 

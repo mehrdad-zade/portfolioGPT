@@ -6,7 +6,7 @@ pip install transformers
 
 import os
 import openai
-from llama_index import SimpleDirectoryReader, GPTVectorStoreIndex, LLMPredictor, PromptHelper
+from llama_index import SimpleDirectoryReader, GPTVectorStoreIndex, LLMPredictor, PromptHelper, SimpleDirectoryReader
 from langchain import OpenAI
 from llama_index import GPTVectorStoreIndex, TrafilaturaWebReader
 import chromadb
@@ -24,7 +24,7 @@ def createVectorIndex():
     max_input = 4096
     tokens = 256
     chunk_size = 600
-    max_chunk_overlap = 20
+    max_chunk_overlap = 0.5
 
     prompt_helper = PromptHelper(max_input, tokens, max_chunk_overlap, chunk_size_limit=chunk_size)
 
@@ -96,12 +96,12 @@ def query_pages(collection, urls, questions):
         print(f"Answer: {query_engine.query(question)}")
 
 
-# test case
-urls = ["https://mehrdad-zade.github.io/", "https://mehrdad-zade.github.io/#Experience"]    
-questions = ["tell me a bit about mehrdad's background what kind of job would he be suitable for"]
-collection = create_embedding("supertype")
-query_pages(
-        collection,
-        urls,
-        questions
-    )
+# # test case
+# urls = ["https://mehrdad-zade.github.io/", "https://mehrdad-zade.github.io/#Experience"]    
+# questions = ["tell me a bit about mehrdad's background what kind of job would he be suitable for"]
+# collection = create_embedding("supertype")
+# query_pages(
+#         collection,
+#         urls,
+#         questions
+#     )
